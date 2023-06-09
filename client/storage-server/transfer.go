@@ -11,7 +11,7 @@ import (
 
 func (c *Client) TransferFile(ctx context.Context, fileInfo user.FileInfo, serverData user.ServerData) (int64, error) {
 	//var err error
-	conn, err := net.Dial(networkType, serverData.Address)
+	conn, err := net.DialTimeout(networkType, serverData.Address, c.Timeout)
 	if err != nil {
 		return 0, err
 	}
