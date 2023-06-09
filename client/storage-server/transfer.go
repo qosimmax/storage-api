@@ -10,11 +10,15 @@ import (
 )
 
 func (c *Client) TransferFile(ctx context.Context, fileInfo user.FileInfo, serverData user.ServerData) (int64, error) {
-	var err error
-	c.Conns[serverData.ID], err = net.Dial(networkType, serverData.Address)
+	//var err error
+	conn, err := net.Dial(networkType, serverData.Address)
 	if err != nil {
 		return 0, err
 	}
+
+	defer func() {
+		_ = conn.Close()
+	}()
 
 	file, err := fileInfo.File.Open()
 	if err != nil {
@@ -29,11 +33,11 @@ func (c *Client) TransferFile(ctx context.Context, fileInfo user.FileInfo, serve
 	}
 
 	// Send the file id
-	_, _ = c.Conns[serverData.ID].Write([]byte(fileInfo.ID))
+	_, _ = conn.Write([]byte(fileInfo.ID))
 	// Send the file size
 	sizeBuf := make([]byte, 8)
 	binary.LittleEndian.PutUint64(sizeBuf, uint64(fileInfo.Size))
-	_, _ = c.Conns[serverData.ID].Write(sizeBuf)
+	_, _ = conn.Write(sizeBuf)
 	// Send file body
-	return io.CopyN(c.Conns[serverData.ID], file, fileInfo.Size)
+	return io.CopyN(conn, file, fileInfo.Size)
 }

@@ -26,9 +26,9 @@ func TransferFile(
 		}
 		defer f.Close()
 
-		size := fh.Size
+		totalSize := fh.Size
 		filename := fh.Filename
-		partSize := size / limit
+		partSize := fh.Size / limit
 
 		fileID, _ := generateUUID()
 
@@ -43,7 +43,7 @@ func TransferFile(
 			offset := int64(i) * partSize
 			size := partSize
 			if i == limit-1 {
-				size = partSize + size%limit
+				size = partSize + totalSize%limit
 			}
 
 			wg.Add(1)
@@ -62,8 +62,7 @@ func TransferFile(
 
 		wg.Wait()
 
-		log.Println(fileID, filename, size)
-
+		log.Println(fileID, filename, fh.Size)
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
