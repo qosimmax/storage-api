@@ -36,7 +36,15 @@ func (c *Client) AddServer(ctx context.Context, data user.ServerData) (string, e
 }
 
 func (c *Client) prepareFindAvailableServersStmt() error {
-	stmt, err := c.DB.Preparex(`select id, name, address from server limit $1`)
+	stmt, err := c.DB.Preparex(`with srv as (select id, coalesce(sum(sf.part_size), 0) size
+             from server
+                      left join server_files sf on server.id = sf.server_id
+			group by id)
+			select server.id, server.name, server.address
+			from srv
+					 join server on server.id = srv.id
+			order by size
+			limit $1`)
 	if err != nil {
 		return fmt.Errorf("error preparing add find servers stmt %w", err)
 	}
