@@ -61,7 +61,7 @@ func (s *Server) Create(ctx context.Context, config *config.Config) error {
 // Serve tells the server to start listening and serve HTTP requests.
 // It also makes sure that the server gracefully shuts down on exit.
 // Returns an error if an error occurs.
-func (s *Server) Serve(ctx context.Context) error {
+func (srv *Server) Serve(ctx context.Context) error {
 	idleConnsClosed := make(chan struct{}) // this is used to signal that we can not exit
 	go func(ctx context.Context, s *http.Server) {
 		stop := make(chan os.Signal, 1)
@@ -75,12 +75,16 @@ func (s *Server) Serve(ctx context.Context) error {
 			log.Println(err.Error())
 		}
 
+		if err := srv.DB.Close(); err != nil {
+			log.Println(err.Error())
+		}
+
 		close(idleConnsClosed) // call close to say we can now exit the function
-	}(ctx, s.HTTP)
+	}(ctx, srv.HTTP)
 
-	log.Printf("Ready at: %s\n", s.Config.Port)
+	log.Printf("Ready at: %s\n", srv.Config.Port)
 
-	if err := s.HTTP.ListenAndServe(); err != http.ErrServerClosed {
+	if err := srv.HTTP.ListenAndServe(); err != http.ErrServerClosed {
 		return fmt.Errorf("unexpected server error: %w", err)
 	}
 	<-idleConnsClosed // this will block until close is called

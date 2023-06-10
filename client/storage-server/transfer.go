@@ -9,9 +9,9 @@ import (
 	"github.com/qosimmax/storage-api/user"
 )
 
-func (c *Client) TransferFile(ctx context.Context, fileInfo user.FileInfo, serverData user.ServerData) (int64, error) {
+func (c *Client) SendFile(ctx context.Context, srcFileInfo user.SrcFileInfo, dstServer user.ServerData) (int64, error) {
 	//var err error
-	conn, err := net.DialTimeout(networkType, serverData.Address, c.Timeout)
+	conn, err := net.DialTimeout(networkType, dstServer.Address, c.Timeout)
 	if err != nil {
 		return 0, err
 	}
@@ -20,24 +20,24 @@ func (c *Client) TransferFile(ctx context.Context, fileInfo user.FileInfo, serve
 		_ = conn.Close()
 	}()
 
-	file, err := fileInfo.File.Open()
+	file, err := srcFileInfo.File.Open()
 	if err != nil {
 		return 0, err
 	}
 
 	defer file.Close()
 
-	_, err = file.Seek(fileInfo.Offset, 0)
+	_, err = file.Seek(srcFileInfo.Offset, 0)
 	if err != nil {
 		return 0, err
 	}
 
 	// Send the file id
-	_, _ = conn.Write([]byte(fileInfo.ID))
+	_, _ = conn.Write([]byte(srcFileInfo.ID))
 	// Send the file size
 	sizeBuf := make([]byte, 8)
-	binary.LittleEndian.PutUint64(sizeBuf, uint64(fileInfo.Size))
+	binary.LittleEndian.PutUint64(sizeBuf, uint64(srcFileInfo.Size))
 	_, _ = conn.Write(sizeBuf)
 	// Send file body
-	return io.CopyN(conn, file, fileInfo.Size)
+	return io.CopyN(conn, file, srcFileInfo.Size)
 }

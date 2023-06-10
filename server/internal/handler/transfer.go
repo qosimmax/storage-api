@@ -13,7 +13,7 @@ import (
 const limit = 6
 
 func TransferFile(
-	db user.ServerFinder,
+	db user.ServerFileHandler,
 	ft user.FileTransfer,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +32,7 @@ func TransferFile(
 
 		fileID, _ := generateUUID()
 
-		servers, err := db.GetServers(ctx, limit)
+		servers, err := db.FindAvailableServers(ctx, limit)
 		if err != nil {
 			handleError(w, err, http.StatusInternalServerError, true)
 			return
@@ -47,22 +47,39 @@ func TransferFile(
 			}
 
 			wg.Add(1)
-			go func(offset, size int64, server user.ServerData) {
-				_, _ = ft.TransferFile(ctx, user.FileInfo{
+			go func(offset, size int64, order int, server user.ServerData) {
+				_, _ = ft.SendFile(ctx, user.SrcFileInfo{
 					ID:     fileID,
 					File:   r.MultipartForm.File["file"][0],
 					Offset: offset,
 					Size:   size,
 				}, server)
+
+				_ = db.AddPartitionFileInfo(ctx, user.PartitionFileInfo{
+					FileID:   fileID,
+					ServerID: server.ID,
+					PartSize: size,
+					Order:    order,
+				})
 				wg.Done()
 
-			}(offset, size, server)
+			}(offset, size, i, server)
 
 		}
 
 		wg.Wait()
 
-		log.Println(fileID, filename, fh.Size)
+		log.Println(fileID, filename, totalSize)
+		err = db.AddFileInfo(ctx, user.FileInfo{
+			ID:   fileID,
+			Name: filename,
+			Size: totalSize,
+		})
+		if err != nil {
+			handleError(w, err, http.StatusInternalServerError, true)
+			return
+		}
+
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
