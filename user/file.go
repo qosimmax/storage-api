@@ -14,6 +14,11 @@ type FileInfoAdder interface {
 	AddFileInfo(ctx context.Context, file FileInfo) error
 }
 
+// FileInfoGetter is an interface for getting file info
+type FileInfoGetter interface {
+	GetFileInfo(ctx context.Context, fileID string) (*FileInfo, error)
+}
+
 // PartitionFileInfo is a struct containing data about a partition file
 type PartitionFileInfo struct {
 	FileID   string `json:"file_id"`

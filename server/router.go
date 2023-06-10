@@ -17,5 +17,7 @@ func (s *Server) setupRoutes() {
 
 	api := s.Router.PathPrefix(v1API).Subrouter()
 	api.HandleFunc("/file-upload", handler.TransferFile(s.DB, s.Storage)).Methods(http.MethodPost).Name("FileUpload")
+	api.HandleFunc("/file-download", handler.ReceiveFile(s.DB, s.Storage)).Methods(http.MethodGet).Name("FileDownload")
 	api.HandleFunc("/add-server", handler.AddServer(s.DB)).Methods(http.MethodPost).Name("AddServer")
+
 }

@@ -29,3 +29,8 @@ type ServerFileHandler interface {
 	FileInfoAdder
 	PartitionFileInfoAdder
 }
+
+type FileInfoHandler interface {
+	FileInfoGetter
+	FileLocationServerFinder
+}

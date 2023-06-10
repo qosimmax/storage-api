@@ -11,11 +11,13 @@ import (
 
 // Client holds the database client and prepared statements.
 type Client struct {
-	DB                       *sqlx.DB
-	AddServerStmt            *sqlx.Stmt
-	FindAvailableServersStmt *sqlx.Stmt
-	AddFileInfoStmt          *sqlx.Stmt
-	AddPartitionFileInfoStmt *sqlx.Stmt
+	DB                          *sqlx.DB
+	AddServerStmt               *sqlx.Stmt
+	FindAvailableServersStmt    *sqlx.Stmt
+	AddFileInfoStmt             *sqlx.Stmt
+	AddPartitionFileInfoStmt    *sqlx.Stmt
+	FindFileLocationServersStmt *sqlx.Stmt
+	GetFileInfoStmt             *sqlx.Stmt
 }
 
 // Init sets up a new database client.
@@ -60,6 +62,14 @@ func (c *Client) Init(ctx context.Context, config *config.Config) error {
 		return err
 	}
 
+	if err := c.prepareGetFileInfoStmt(); err != nil {
+		return err
+	}
+
+	if err := c.prepareFindFileLocationServersStmt(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -79,6 +89,14 @@ func (c *Client) Close() error {
 	}
 
 	if err := c.FindAvailableServersStmt.Close(); err != nil {
+		return err
+	}
+
+	if err := c.GetFileInfoStmt.Close(); err != nil {
+		return err
+	}
+
+	if err := c.FindFileLocationServersStmt.Close(); err != nil {
 		return err
 	}
 

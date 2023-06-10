@@ -48,3 +48,38 @@ func (c *Client) AddPartitionFileInfo(ctx context.Context, partitionFile user.Pa
 
 	return err
 }
+
+func (c *Client) prepareGetFileInfoStmt() error {
+	stmt, err := c.DB.Preparex(`select id, name, size from  file_info where id=$1`)
+	if err != nil {
+		return fmt.Errorf("error preparing get file info stmt %w", err)
+	}
+
+	c.GetFileInfoStmt = stmt
+	return nil
+
+}
+
+func (c *Client) GetFileInfo(ctx context.Context, fileID string) (*user.FileInfo, error) {
+	cctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	var row fileInfoRow
+	err := c.GetFileInfoStmt.GetContext(cctx, &row, fileID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user.FileInfo{
+		ID:   row.ID,
+		Name: row.Name,
+		Size: row.Size,
+	}, nil
+
+}
+
+type fileInfoRow struct {
+	ID   string `db:"id"`
+	Name string `db:"name"`
+	Size int64  `db:"size"`
+}

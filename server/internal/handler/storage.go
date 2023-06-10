@@ -86,6 +86,37 @@ func TransferFile(
 	}
 }
 
+func ReceiveFile(
+	db user.FileInfoHandler,
+	fr user.FileReceiver,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		fileID := r.URL.Query().Get("file_id")
+		fileInfo, err := db.GetFileInfo(ctx, fileID)
+		if err != nil {
+			handleError(w, err, http.StatusInternalServerError, true)
+			return
+		}
+
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileInfo.Name))
+		w.Header().Set("Content-Type", "application/octet-stream")
+
+		servers, err := db.FindFileLocationServers(ctx, fileID)
+		if err != nil {
+			handleError(w, err, http.StatusInternalServerError, true)
+			return
+		}
+
+		for _, server := range servers {
+			n, err := fr.ReceiveFile(ctx, fileID, server, w)
+			log.Println(n, err)
+		}
+
+	}
+}
+
 func generateUUID() (string, error) {
 	id, err := uuid.NewRandom()
 	if err != nil {

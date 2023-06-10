@@ -32,6 +32,8 @@ func (c *Client) SendFile(ctx context.Context, srcFileInfo user.SrcFileInfo, dst
 		return 0, err
 	}
 
+	// SEND command
+	_, _ = conn.Write([]byte("SENT"))
 	// Send the file id
 	_, _ = conn.Write([]byte(srcFileInfo.ID))
 	// Send the file size
