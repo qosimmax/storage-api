@@ -16,8 +16,8 @@ func (s *Server) setupRoutes() {
 	s.Router.HandleFunc("/_healthz", handler.Healthz).Methods(http.MethodGet).Name("Health")
 
 	api := s.Router.PathPrefix(v1API).Subrouter()
-	api.HandleFunc("/file", handler.TransferFile(s.DB, s.Storage)).Methods(http.MethodPost).Name("FileUpload")
-	api.HandleFunc("/file", handler.ReceiveFile(s.DB, s.Storage)).Methods(http.MethodGet).Name("FileDownload")
+	api.HandleFunc("/object", handler.TransferFile(s.DB, s.Storage)).Methods(http.MethodPost).Name("FileUpload")
+	api.HandleFunc("/object", handler.ReceiveFile(s.DB, s.Storage)).Methods(http.MethodGet).Name("FileDownload")
 	api.HandleFunc("/server", handler.AddServer(s.DB)).Methods(http.MethodPost).Name("AddServer")
 
 }

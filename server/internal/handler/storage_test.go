@@ -26,7 +26,7 @@ func TestTransferFile(t *testing.T) {
 	_, _ = part.Write([]byte(mock.DummyData))
 	_ = writer.Close()
 
-	req, err := http.NewRequest("POST", "/file", body)
+	req, err := http.NewRequest("POST", "/object", body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func TestTransferFile(t *testing.T) {
 }
 
 func receiveFileFile(t *testing.T, fileID string) {
-	req, err := http.NewRequest("GET", "/file", nil)
+	req, err := http.NewRequest("GET", "/object", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
