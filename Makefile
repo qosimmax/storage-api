@@ -8,6 +8,10 @@ APP_CMD_DIR=${CURRENT_DIR}/cmd/server
 build:
 	CGO_ENABLED=0 GOOS=linux go build  -a -installsuffix cgo -o ${CURRENT_DIR}/bin/${APP} ${APP_CMD_DIR}/main.go
 
+## server: runs the server
+run:
+	go run ${APP_CMD_DIR}/main.go
+
 ## test: runs tests
 test:
 	go test  ./...
