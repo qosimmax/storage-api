@@ -29,6 +29,7 @@ func TransferFile(
 		totalSize := fh.Size
 		filename := fh.Filename
 		partSize := fh.Size / limit
+		remainSize := fh.Size % limit
 
 		fileID, _ := generateUUID()
 
@@ -39,11 +40,12 @@ func TransferFile(
 		}
 
 		wg := sync.WaitGroup{}
+		offset := int64(0)
 		for i, server := range servers {
-			offset := int64(i) * partSize
 			size := partSize
-			if i == limit-1 {
-				size = partSize + totalSize%limit
+			if remainSize > 0 {
+				size += 1
+				remainSize -= 1
 			}
 
 			wg.Add(1)
@@ -64,6 +66,8 @@ func TransferFile(
 				wg.Done()
 
 			}(offset, size, i, server)
+
+			offset += size
 
 		}
 
