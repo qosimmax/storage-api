@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"sync"
 
@@ -34,14 +33,13 @@ func TransferFile(
 		partSize := fh.Size / limit
 		remainSize := fh.Size % limit
 
-		fileID, _ := generateUUID()
-
 		servers, err := db.FindAvailableServers(ctx, limit)
 		if err != nil {
 			handleError(w, err, http.StatusInternalServerError, true)
 			return
 		}
 
+		fileID, _ := generateUUID()
 		wg := sync.WaitGroup{}
 		offset := int64(0)
 		// Send partition files to server concurrently.
@@ -77,7 +75,6 @@ func TransferFile(
 
 		wg.Wait()
 
-		log.Println(fileID, filename, totalSize)
 		err = db.AddFileInfo(ctx, user.FileInfo{
 			ID:   fileID,
 			Name: filename,
