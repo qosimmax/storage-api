@@ -44,6 +44,7 @@ func TransferFile(
 
 		wg := sync.WaitGroup{}
 		offset := int64(0)
+		// Send partition files to server concurrently.
 		for i, server := range servers {
 			size := partSize
 			if remainSize > 0 {
@@ -95,6 +96,8 @@ func TransferFile(
 	}
 }
 
+// ReceiveFile handler should accept an interface(s), and should contain only high level
+// business logic.
 func ReceiveFile(
 	db user.FileInfoHandler,
 	fr user.FileReceiver,
@@ -118,6 +121,8 @@ func ReceiveFile(
 			return
 		}
 
+		// Getting file from servers sequentially and merge.
+		// We can get files concurrently but there is needed to extra memory
 		for _, server := range servers {
 			_, err := fr.ReceiveFile(ctx, fileID, server, w)
 			if err != nil {
