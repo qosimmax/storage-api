@@ -16,7 +16,7 @@ const limit = 6
 // business logic.
 func TransferFile(
 	db user.ServerFileHandler,
-	ft user.FileTransfer,
+	fs user.FileTransfer,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -52,7 +52,7 @@ func TransferFile(
 
 			wg.Add(1)
 			go func(offset, size int64, order int, server user.ServerData) {
-				_, _ = ft.SendFile(ctx, user.SrcFileInfo{
+				_, _ = fs.SendFile(ctx, user.SrcFileInfo{
 					ID:     fileID,
 					File:   r.MultipartForm.File["file"][0],
 					Offset: offset,
@@ -97,7 +97,7 @@ func TransferFile(
 // business logic.
 func ReceiveFile(
 	db user.FileInfoHandler,
-	fr user.FileReceiver,
+	fs user.FileReceiver,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -121,7 +121,7 @@ func ReceiveFile(
 		// Getting file from servers sequentially and merge.
 		// We can get files concurrently but there is needed to extra memory
 		for _, server := range servers {
-			_, err := fr.ReceiveFile(ctx, fileID, server, w)
+			_, err := fs.ReceiveFile(ctx, fileID, server, w)
 			if err != nil {
 				handleError(w, err, http.StatusInternalServerError, true)
 				return
