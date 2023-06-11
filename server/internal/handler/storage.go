@@ -13,6 +13,8 @@ import (
 
 const limit = 6
 
+// TransferFile handler should accept an interface(s), and should contain only high level
+// business logic.
 func TransferFile(
 	db user.ServerFileHandler,
 	ft user.FileTransfer,

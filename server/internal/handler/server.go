@@ -8,6 +8,8 @@ import (
 	"github.com/qosimmax/storage-api/user"
 )
 
+// AddServer handler should accept an interface(s), and should contain only high level
+// business logic.
 func AddServer(
 	db user.ServerAdder,
 ) http.HandlerFunc {
