@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -84,8 +85,10 @@ func TransferFile(
 			return
 		}
 
+		response, _ := json.Marshal(map[string]string{"file_id": fileID})
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(response)
 
 	}
 }
