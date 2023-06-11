@@ -117,8 +117,11 @@ func ReceiveFile(
 		}
 
 		for _, server := range servers {
-			n, err := fr.ReceiveFile(ctx, fileID, server, w)
-			log.Println(n, err)
+			_, err := fr.ReceiveFile(ctx, fileID, server, w)
+			if err != nil {
+				handleError(w, err, http.StatusInternalServerError, true)
+				return
+			}
 		}
 
 	}
