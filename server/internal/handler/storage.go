@@ -47,7 +47,7 @@ func TransferFile(
 		fileID, _ := generateUUID()
 		wg := sync.WaitGroup{}
 		offset := int64(0)
-		// Send partition files to server concurrently.
+		// Send partition files to servers concurrently.
 		for i, server := range servers {
 			size := partSize
 			if remainSize > 0 {
@@ -128,7 +128,7 @@ func ReceiveFile(
 			return
 		}
 
-		// Getting file from servers sequentially and merge.
+		// Getting files from servers sequentially and merge.
 		// We can get files concurrently but there is needed to extra memory
 		for _, server := range servers {
 			_, err := fs.ReceiveFile(ctx, fileID, server, w)
