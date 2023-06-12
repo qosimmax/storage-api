@@ -8,7 +8,18 @@ import (
 	"github.com/qosimmax/storage-api/user"
 )
 
-// AddServer handler should accept an interface(s), and should contain only high level
+// AddServer is a handler that adds a new server
+//
+//	POST /api/v1/server
+//	Responds: 200, 400, 500
+//	Body:
+//		type ServerData struct {
+//			ID      string `json:"id"`
+//			Name    string `json:"name"`
+//			Address string `json:"address"`
+//		}
+//
+// The handler should accept an interface(s), and should contain only high level
 // business logic.
 func AddServer(
 	db user.ServerAdder,

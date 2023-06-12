@@ -12,7 +12,12 @@ import (
 
 const limit = 6
 
-// TransferFile handler should accept an interface(s), and should contain only high level
+// TransferFile is a handler that upload a file
+//
+//	POST /api/v1/object
+//	Responds: 200, 500
+//
+// The handler should accept an interface(s), and should contain only high level
 // business logic.
 func TransferFile(
 	db user.ServerFileHandler,
@@ -93,7 +98,12 @@ func TransferFile(
 	}
 }
 
-// ReceiveFile handler should accept an interface(s), and should contain only high level
+// ReceiveFile is a handler that download a file
+//
+//	GET /api/v1/object
+//	Responds: 200, 500
+//
+// The handler should accept an interface(s), and should contain only high level
 // business logic.
 func ReceiveFile(
 	db user.FileInfoHandler,
