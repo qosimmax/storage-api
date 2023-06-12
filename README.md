@@ -27,3 +27,40 @@ In order to run this app, run the following commands:
 
 1. `make run`
 
+## DB tables
+
+```sql
+create table server
+(
+    id      varchar(36)  not null
+        primary key,
+    name    varchar(100) not null,
+    address varchar(50)  not null
+);
+
+create unique index server_address_uindex
+    on server (address)
+
+```
+
+```sql
+create table file_info
+(
+    id         varchar(36) not null
+        primary key,
+    name       text,
+    size       bigint,
+    created_at timestamp
+)
+```
+
+```sql
+create table server_files
+(
+    file_id    varchar(36),
+    server_id  varchar(36),
+    part_size  bigint,
+    "order"    integer,
+    created_at timestamp
+)
+```
