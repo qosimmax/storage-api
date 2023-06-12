@@ -10,6 +10,7 @@ Storage API is a file storage service for storing and accessing data.
 
 * [Go](https://golang.org) 
 * [Postgres](https://www.postgresql.org/)
+* [File Server API](https://github.com/qosimmax/file-server-api)
 
 ## Setup
 
