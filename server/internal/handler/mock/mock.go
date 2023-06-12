@@ -93,7 +93,10 @@ func (f FileReceiverMock) ReceiveFile(ctx context.Context, fileID string, dstSer
 		return 0, err
 	}
 
-	defer file.Close()
+	defer func() {
+		file.Close()
+		os.Remove(path)
+	}()
 
 	return io.Copy(w, file)
 }
