@@ -4,7 +4,7 @@
 
 ## Description
 
-## Пошли вы нахуй со своей задачей...
+## Storage API is a file storage service for storing and accessing data.
 
 ## Requirements
 
